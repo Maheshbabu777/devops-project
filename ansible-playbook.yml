@@ -1,0 +1,22 @@
+---
+- name: Deploy DevOps Project
+  hosts: webservers
+  become: yes
+  
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Pull latest image
+      command: docker pull devops-project:latest
+
+    - name: Run container
+      docker_container:
+        name: devops-project
+        image: devops-project:latest
+        state: started
+        ports:
+          - "5000:5000"
