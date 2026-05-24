@@ -1,7 +1,16 @@
+# sensitive keys
+devops-key.pem
+
+# large tar files
+devops-project.tar
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# python
 __pycache__/
 *.pyc
 .env
-*.tfstate
-*.tfstate.backup
-.terraform/
-.terraform.lock.hcl
