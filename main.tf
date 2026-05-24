@@ -25,6 +25,10 @@ resource "aws_security_group" "devops_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "devops-sg"
+  }
 }
 
 resource "aws_instance" "devops_ec2" {
@@ -32,6 +36,17 @@ resource "aws_instance" "devops_ec2" {
   instance_type          = "t3.micro"
   key_name               = "devops-key"
   vpc_security_group_ids = [aws_security_group.devops_sg.id]
+  associate_public_ip_address = true
+
+  user_data_base64 = base64encode(<<-EOF
+              #!/bin/bash
+              sudo yum update -y
+              sudo yum install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
+              sudo usermod -aG docker ec2-user
+              EOF
+  )
 
   tags = {
     Name = "devops-project-mahesh"
@@ -40,4 +55,8 @@ resource "aws_instance" "devops_ec2" {
 
 output "public_ip" {
   value = aws_instance.devops_ec2.public_ip
+}
+
+output "instance_id" {
+  value = aws_instance.devops_ec2.id
 }
