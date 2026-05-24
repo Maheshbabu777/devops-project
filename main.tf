@@ -32,11 +32,12 @@ resource "aws_security_group" "devops_sg" {
 }
 
 resource "aws_instance" "devops_ec2" {
-  ami                    = "ami-0c02fb55956c7d316"
-  instance_type          = "t3.micro"
-  key_name               = "devops-key"
-  vpc_security_group_ids = [aws_security_group.devops_sg.id]
+  ami                         = "ami-0c02fb55956c7d316"
+  instance_type               = "t3.micro"
+  key_name                    = "devops-key"
+  security_groups             = [aws_security_group.devops_sg.name]
   associate_public_ip_address = true
+  iam_instance_profile        = null
 
   user_data_base64 = base64encode(<<-EOF
               #!/bin/bash
@@ -47,6 +48,8 @@ resource "aws_instance" "devops_ec2" {
               sudo usermod -aG docker ec2-user
               EOF
   )
+
+  depends_on = [aws_security_group.devops_sg]
 
   tags = {
     Name = "devops-project-mahesh"
