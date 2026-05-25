@@ -1,14 +1,20 @@
 ---
-- name: Deploy DevOps Project
+- name: Deploy Todo App
   hosts: webservers
   become: yes
-  
+
   tasks:
     - name: Install Docker
       apt:
         name: docker.io
         state: present
         update_cache: yes
+
+    - name: Create data directory for SQLite
+      file:
+        path: /opt/devops-project/data
+        state: directory
+        mode: '0755'
 
     - name: Pull latest image
       command: docker pull devops-project:latest
@@ -18,5 +24,10 @@
         name: devops-project
         image: devops-project:latest
         state: started
+        restart_policy: always
         ports:
           - "5000:5000"
+        volumes:
+          - /opt/devops-project/data:/app/data
+        env:
+          DATABASE: /app/data/todos.db

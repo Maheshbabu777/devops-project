@@ -5,3 +5,10 @@ services:
     ports:
       - "5000:5000"
     restart: always
+    volumes:
+      - db-data:/app/data
+    environment:
+      - DATABASE=/app/data/todos.db
+
+volumes:
+  db-data:

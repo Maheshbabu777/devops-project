@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary:   #0a0a0a;
+            --bg-elevated:  #141414;
+            --bg-input:     #1a1a1a;
+            --text-primary: #e8e8e8;
+            --text-muted:   #707070;
+            --text-dim:     #404040;
+            --border:       #252525;
+            --accent:       #ffffff;
+            --accent-hover: #d0d0d0;
+            --danger:       #ef4444;
+            --success:      #10b981;
+            --radius:       10px;
+            --radius-sm:    6px;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 72px 24px 120px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: 48px;
+        }
+
+        form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 56px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--text-dim);
+            background: var(--bg-elevated);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-dim);
+        }
+
+        button {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius);
+            padding: 16px 32px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        h2 {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+            margin-top: 48px;
+        }
+
+        h2:first-of-type {
+            margin-top: 0;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .todo-item:hover {
+            border-color: var(--text-dim);
+            transform: translateY(-1px);
+        }
+
+        .todo-item span {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .todo-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .todo-item div {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .todo-item:hover div {
+            opacity: 1;
+        }
+
+        .todo-item a {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .toggle {
+            background: var(--success);
+            color: var(--bg-primary);
+        }
+
+        .toggle:hover {
+            background: #059669;
+        }
+
+        .completed .toggle {
+            background: var(--text-dim);
+            color: var(--text-primary);
+        }
+
+        .completed .toggle:hover {
+            background: var(--text-muted);
+        }
+
+        .delete {
+            background: var(--danger);
+            color: var(--text-primary);
+        }
+
+        .delete:hover {
+            background: #dc2626;
+        }
+
+        p {
+            font-size: 14px;
+            color: var(--text-dim);
+            padding: 40px 20px;
+            text-align: center;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tasks</h1>
+
+        <form method="POST" action="/add">
+            <input type="text" name="task" placeholder="What needs to be done?" required autofocus autocomplete="off">
+            <button type="submit">Add Task</button>
+        </form>
+
+        <h2>Pending</h2>
+        {% if pending %}
+            {% for todo in pending %}
+                <div class="todo-item">
+                    <span>{{ todo['task'] }}</span>
+                    <div>
+                        <a href="/toggle/{{ todo['id'] }}" class="toggle">Complete</a>
+                        <a href="/delete/{{ todo['id'] }}" class="delete">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No pending tasks</p>
+        {% endif %}
+
+        <h2>Completed</h2>
+        {% if completed %}
+            {% for todo in completed %}
+                <div class="todo-item completed">
+                    <span>{{ todo['task'] }}</span>
+                    <div>
+                        <a href="/toggle/{{ todo['id'] }}" class="toggle">Restore</a>
+                        <a href="/delete/{{ todo['id'] }}" class="delete">Delete</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No completed tasks</p>
+        {% endif %}
+    </div>
+</body>
+</html>
